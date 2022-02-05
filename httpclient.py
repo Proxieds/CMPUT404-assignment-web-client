@@ -19,7 +19,11 @@
 # The point is to understand what you have to send and get experience with it
 
 # Resources Used:
-# https://docs.python.org/3/library/urllib.parse.html | For documentation on using urllip.parse
+# HTTP Part I Notes
+# https://docs.python.org/3/library/urllib.parse.html
+# https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST
+# https://stackoverflow.com/questions/4271553/how-do-i-write-a-regular-expression-to-match-any-three-digit-number-value
+# https://stackoverflow.com/questions/38146772/get-everything-after-a-particular-string-in-python-using-regular-expression
 
 
 import sys
@@ -48,7 +52,7 @@ class HTTPClient(object):
         """
         Uses regex to match the first 3 consecutive integers which represents the status code
         """
-        pattern = r'\b\d{3}\b'
+        pattern = r'\d{3}'
         return re.findall(pattern, data)[0]
 
     def get_headers(self,data):

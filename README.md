@@ -18,3 +18,10 @@ examples thus some of the code is Copyright © 2001-2013 Python
 Software Foundation; All Rights Reserved under the PSF license (GPL
 compatible) http://docs.python.org/2/library/socketserver.html
 
+# References:
+* Resources used for this assignment:
+* HTTP Part I Notes
+* https://docs.python.org/3/library/urllib.parse.html | For documentation on using urllip.parse
+* https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST | Example POST request headers
+* https://stackoverflow.com/questions/4271553/how-do-i-write-a-regular-expression-to-match-any-three-digit-number-value | Matching 3 numbers for the status code
+* https://stackoverflow.com/questions/38146772/get-everything-after-a-particular-string-in-python-using-regular-expression | For information on string.partition for parsing the body and headers from response
