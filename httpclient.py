@@ -25,7 +25,7 @@ import sys
 import socket
 import re
 # you may use urllib to encode data appropriately
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlencode
 
 def help():
     print("httpclient.py [GET/POST] [URL]\n")
@@ -52,14 +52,14 @@ class HTTPClient(object):
 
     def get_headers(self,data):
         """
-        Function uses partition on the seequence of carriage returns and newlines to separate the response header from data
+        Function uses partition on the sequence of carriage returns and newlines to separate the response header from data
         """
         pattern='\r\n\r\n'
         return data.partition(pattern)[0]
 
     def get_body(self, data):
         """
-        Function uses partition on the seequence of carriage returns and newlines to separate the body from data
+        Function uses partition on the sequence of carriage returns and newlines to separate the body from data
         """
         pattern='\r\n\r\n'
         return data.partition(pattern)[2]
@@ -82,28 +82,42 @@ class HTTPClient(object):
                 done = not part
         return buffer.decode('utf-8')
 
-    def sendRequest(self, method, path, host_name):
+    def sendRequest(self, method, path, host_name, args = None):
         """
         Helper Function that sends a request using the input HTTP method, path and hostname
         """
-        self.sendall("{0} {1} HTTP/1.1\r\n".format(method, path))
-        self.sendall("Host: {0}\r\n".format(host_name))
-        self.sendall("User-Agent: Assignment 2 Web-Client\r\n")
-        self.sendall("Accept: */*\r\n")
-        self.sendall("Connection: close\r\n\r\n")
+        if method is "GET":
+            self.sendall("{0} {1} HTTP/1.1\r\n".format(method, path))
+            self.sendall("Host: {0}\r\n".format(host_name))
+            self.sendall("User-Agent: Assignment 2 Web-Client\r\n")
+            self.sendall("Accept: */*\r\n")
+            self.sendall("Connection: close\r\n\r\n")
+        
+        # Post Request Add Content-Type, Content-Length as well as Request Body
+        else:
+            print(args)
+            self.sendall("{0} {1} HTTP/1.1\r\n".format(method, path))
+            self.sendall("Host: {0}\r\n".format(host_name))
+            self.sendall("User-Agent: Assignment 2 Web-Client\r\n")
+            self.sendall("Accept: */*\r\n")
+            self.sendall("Content-Type: application/x-www-form-urlencoded\r\n")
+            self.sendall("Content-Length: {0}\r\n".format(len(args) if args else 0))
+            self.sendall("Connection: close\r\n\r\n")
+            if args:
+                self.sendall(args)
+            
+        
 
     def GET(self, url, args=None):
         """
         Helper Function that handles sending receiving a url input and sending GET Requests
         """
         o = urlparse(url)
-        print(o)
         # Default port will be 80 if port is not specified
         default_port = o.port if o.port else 80
         default_path = o.path if o.path else "/"
-        print(o.hostname)
-        print(default_port)
-        print(o.path)
+
+
 
         try:
             # Connect to the entered server
@@ -124,7 +138,7 @@ class HTTPClient(object):
             print(e)
             code = 400
             body = "Bad Request"
-        print(code,body)
+
         return HTTPResponse(int(code), body)
 
     def POST(self, url, args=None):
@@ -132,20 +146,19 @@ class HTTPClient(object):
         Helper Function that handles sending receiving a url input and sending POST Requests
         """
         o = urlparse(url)
-        print(o)
         # Default port will be 80 if port is not specified
-        default_port = o.port if not o.port is None else 80
-        default_path = o.path if not o.path is None else "/"
-        print(o.hostname)
-        print(default_port)
-        print(o.path)
+        default_port = o.port if o.port else 80
+        default_path = o.path if o.path else "/"
+        default_args = urlencode(args) if args else None
+
+        # code,body = self.makeRequest("POST", default_path, o.hostname, default_args)
 
         try:
             # Connect to the entered server
             socket = self.connect(o.hostname, default_port)
             
             # Sends a GET request using the path and host name
-            self.sendRequest("POST", default_path, o.hostname)
+            self.sendRequest("POST", default_path, o.hostname, default_args)
 
             # Receive and parse response data
             data = self.recvall(socket)
@@ -159,7 +172,7 @@ class HTTPClient(object):
             print(e)
             code = 400
             body = "Bad Request"
-        print(code,body)
+
         return HTTPResponse(int(code), body)
 
     def command(self, url, command="GET", args=None):
