@@ -99,8 +99,8 @@ class HTTPClient(object):
         o = urlparse(url)
         print(o)
         # Default port will be 80 if port is not specified
-        default_port = o.port if not o.port is None else 80
-        default_path = o.path if not o.path is None else "/"
+        default_port = o.port if o.port else 80
+        default_path = o.path if o.path else "/"
         print(o.hostname)
         print(default_port)
         print(o.path)
